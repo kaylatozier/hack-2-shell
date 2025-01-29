@@ -1,1 +1,1 @@
-crazy confusing
+git is crazy confusing
