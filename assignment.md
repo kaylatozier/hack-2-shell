@@ -17,12 +17,37 @@ Use grep, uniq, and sed for this question. Check that all of the species names a
 $ grep NA iris-data-dirty.csv
 $ grep -v NA iris-data-dirty.csv > iris-data-noNA.csv
 $ cut -f 5 -d ',' iris-data-noNA.csv | sort | uniq -c
-$ grep -v NA iris-data-dirty.csv | sed 's/Iris-setsa/Iris-setosa/g' | sed 's/Iris-versicolour/Iris-versicolor/g' > iris-data-clean.csv
+$ grep -v NA iris-data-noNA.csv | sed 's/Iris-setsa/Iris-setosa/g' | sed 's/Iris-versicolour/Iris-versicolor/g' > iris-data-clean.csv
 ```
-
 
 # Question 3: Find a sequence
 Find how many lines in the data file test.fastq.gz start with "TGCAG" and end with "GAG". Describe your work.
 
+**My solution:** With the help of the assignment review, I learned that you can unpack the data with gunzip using `-c` to push the data to stdout instead of having to unzip the file in place. In order to find the files that both start with "TGCAG" and end with "GAG" we have to pipe with grep so that it first finds TGCAG at the beginning of the line with the `^` and using `$` at the end of the line. I'll also pipe `wc -l` to count the lines. Doing so gives me the solution of 44 lines. 
+
+```bash
+gunzip -c test.fastq.gz | grep "^TGCAG" | grep "GAG$" | wc -l
+```
+
 # Question 4: Find a sequence chunk
 Using grep and other tools if necessary find all lines that contain the sequence "AAAACCCC" and for each print that line, the line above it, and two lines below it (so that a 4-line chunk around each search hit is printed). Describe your work.
+
+**My solution:** First I used `grep` to find the lines with the sequence "AAAACCCC". From the `man grep` we learned that you can use the option `-A #` for x amount of lines after and option `B #` for x amount of lines before. 
+
+```bash
+$ gunzip -c test.fastq.gz | grep AAAACCCC
+$ gunzip -c test.fastq.gz | grep AAAACCCC -B 1 -A 2
+```
+
+This prints out:
+```
+@32082_przewalskii.98 GRC13_0027_FC:4:1:5669:1669 length=74
+TGCAGAATAGATAGGAAACGTTTTGGCGCTGTAGACATTAAAACCCCAGTAGGACACGGGTATCACAACGTACA
++32082_przewalskii.98 GRC13_0027_FC:4:1:5669:1669 length=74
+IIIIIIIIIIIIIIIIIIHIHIIIIIIIIGIIIGIIIIIIHIIIIIIIHIIIIHIIIIIIEHIHHIIIIICIHI
+--
+@33413_thamno.59 GRC13_0027_FC:4:1:5000:1620 length=74
+TGCAGTGGATCGAAAACCCCGAGGCTCAAGGTCACGCCACCGTCTTCGTGGCCAAGTTCTTCGGCCGCGCCGGC
++33413_thamno.59 GRC13_0027_FC:4:1:5000:1620 length=74
+IIIIIIIIIIIIIIIIIIIIDHIIHHIIIIIEIBGBGGGIIHEHHHIEBBHHIEGGDGIGGHAEFDBFBDDB?D
+```
